@@ -1,0 +1,12 @@
+Data to support "Simulating ice shelf extent using damage mechanics," by S Kachuck, M Whitcomb, J Bassis, D Martin, and S Price, submitted to the Journal of Glaciology.
+
+Contents:
+BISICLES damagedBISICLES source code (BISICLESsrc.tar.gz, untar with
+	tar -xzvf BISICLESsrc.tar.gz)
+BISICLES configuration files necessary to rerun the primary simulations for the
+        1) Erebus Glacier Tongue (inputs.erebus)
+        2) Drygalski Ice Tongue (inputs.drygalski)
+        3) Amery Ice Shelf at XXX m a^-1 uniform melt rate (inputs.amery.XXXflux)
+        4) Ross Ice Shelf at XXX m a^-1 uniform melt rate (inputs.ross.XXXflux)
+	(Using BISICLES branch damagedBISICLES
+	svn co https://anag-repo.lbl.gov/svn/BISICLES/public/branches/damagedBISICLES BISICLES)

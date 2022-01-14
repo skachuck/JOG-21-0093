@@ -1,0 +1,201 @@
+amr.plot_interval = 50
+main.maxStep = 10000   # maximum number of steps to run
+
+#amr.plot_interval = 1
+#main.maxStep = 1   # maximum number of steps to run###### BED GEOMETRY ######
+# For floating tongue, only grounding line essential
+geometry.problem_type = marineIceSheet
+marineIceSheet.geometry = confinedTongue
+marineIceSheet.bedSlope = 0 0
+# Computed using rho_i=920, rho_w=1030
+marineIceSheet.originElevation = -303.689
+marineIceSheet.originElevation = -390.
+marineIceSheet.wallWidth = -100000000
+marineIceSheet.wallElevation = -300.973
+
+###### ICE GEOMETRY ######
+marineIceSheet.thickness_type = compactSupportTongue
+confinedTongue.glthk = 340.0   # Grounding line thickness
+confinedTongue.glvel = 100.0   # Grounding line velocity
+confinedTongue.A = .78e-17   # Ice softness
+confinedTongue.glthk = 434.0   # Grounding line thickness
+confinedTongue.glvel = 94.9   # Grounding line velocity
+confinedTongue.A = 2.52e-17   # Ice softness
+# note that compactSupport classes spill over the domain
+# boundaries where appropriate
+marineIceSheet.loBound = -5000.0 -5000.0 
+marineIceSheet.hiBound =  17000.0 15000.0
+# No slip boundary
+geometry.beta_type = constantBeta
+geometry.betaValue = 0.0
+geometry.basalSlope = 0 0 0 
+
+###### MASS BALANCE ######
+surfaceFlux.type = zeroFlux
+basalFlux.type = constantFlux
+basalFlux.flux_value = -1.94
+basalFlux.flux_value = -2.03
+
+###### AMR-RUNTIME PARAMETERS ######
+main.poutBaseName = pout.erebus
+main.maxTime = 200  # maximum time to run to
+main.domain_size = 16.0e3 8.e3 0  # half-domain
+#main.domain_size = 200000.0 200000.0 200000.0  # full-domain
+
+###### ICE RHEOLOGY ######
+#main.constitutiveRelation = GlensLaw
+main.constitutiveRelation = L1L2
+main.rateFactor = constRate
+constRate.A = .78e-17
+constRate.A = 2.52e-17
+
+###### DAMAGE PARAMETERS ######
+amr.evolve_damage = 1
+amr.incorporate_damage = 0
+muCoefficient.type = unit
+damage.type = constant
+damage.type = Nye
+damage.advect = 1   # 0 = off, 1 = on (default)
+damage.manufactured = 0   # 0 = off (default), 1 = on
+damage.source_type = physical
+#amr.fix_partialcell_damage = 1
+
+###### CALVING PARAMETERS ######
+# A fixed calving front - any ice less than the specified thickness is removed
+#CalvingModel.type = FixedFrontCalvingModel
+#CalvingModel.min_thickness = 1.0
+#bc.set_grounded_mask_lo = 1 0
+#bc.set_grounded_mask_hi = 0 0
+#amr.eliminate_remote_ice = 1
+CalvingModel.type = CompositeCalvingModel
+CalvingModel.nElements = 2
+CalvingModel.element0.type = FixedFrontCalvingModel
+CalvingModel.element0.min_thickness = 1.0
+#
+#CalvingModel.element2.type = DamageCalvingModel
+#CalvingModel.element2.damage_val = 1.0
+#
+CalvingModel.element1.type = DomainEdgeCalvingModel
+CalvingModel.element1.front_lo = 0 0 # for half-domain
+CalvingModel.element1.front_hi = 1 0
+
+#bc.set_grounded_mask_lo = 1 0
+#bc.set_grounded_mask_hi = 0 0
+#amr.eliminate_remote_ice = 1
+
+
+
+###### AMR WRITE PARAMETERS ######
+
+amr.mask_sources = 1 # scale source terms by real-valued ice mask
+amr.write_mask = 1
+amr.write_thickness_sources = 1
+amr.write_damage = 1
+amr.write_nye_damage = 1
+amr.plot_prefix = plot.erebus.
+#amr.write_preSolve_plotfiles = true
+amr.write_solver_rhs = 1
+amr.write_mask = 1
+amr.write_temperature = 1
+amr.check_interval = 100
+amr.check_prefix = chk.erebus.
+amr.check_overwrite = false
+amr.verbosity = 5
+
+#amr.gridsFile = grids.dat
+#
+####### AMR AMR PARAMETERS ######
+
+
+amr.maxLevel = 2   # finest level allowed in simulation
+amr.ref_ratio = 2 2 2
+#amr.num_cells = 128 128 128   #number of cells in base grid
+#amr.num_cells = 64 64 16   #number of cells in base grid for half-domain
+#amr.num_cells = 32 32 16   #number of cells in base grid for half-domain
+amr.num_cells = 32 16 2   #number of cells in base grid for half-domain
+#amr.num_cells = 128 64 16   #number of cells in base grid for full-domain
+#amr.domainLoIndex = -64 0 0 # full-domain offset
+amr.is_periodic = 0 1 1    # 1 if domain is periodic 
+# (note that periodic BC's override physical BC types)
+# velocity BC types:  0 = homogeneous Dirichlet
+#                     1 = homogeneous Neumann
+#                     2 = free-slip (Dirichlet-normal, Neumann-tangential)
+bc.lo_bc = 0 2 0   # Dirichlet is required in x for constant input velocity
+bc.hi_bc = 1 2 0  
+bc.new_bc = 0   # 0 for old, 1 for new
+
+amr.temporal_accuracy = 1
+#amr.temporal_accuracy = 2
+#amr.temporal_accuracy = 4
+
+amr.cfl = 0.1  # "cfl" number
+amr.initial_cfl = 0.1  # "cfl" number
+amr.max_dt_grow_factor = 1.1 #max amount dt can grow from one timestep to another
+#amr.fixed_dt = 0.64
+#initial guess 
+amr.do_initial_velocity_guess = 1
+amr.do_initial_velocity_solve = 1
+amr.initial_velocity_guess_type = 1 # linear PDE
+#amr.initial_velocity_guess_const_mu = 1.0e+6
+amr.initial_velocity_guess_solver_type = 1 # use JFNK solver's linear mode
+
+amr.regrid_interval = 10   # number of timesteps between regridding
+#amr.regrid_interval = 1   # number of timesteps between regridding
+amr.blockFactor = 4           # block factor used in grid generation
+amr.fill_ratio = 0.8          # how efficient are the grids
+amr.nestingRadius = 3         # proper nesting radius required
+amr.tags_grow = 2   #          # amount to buffer tags
+amr.max_box_size = 32         # largest box length allowed
+#amr.max_box_size = 64         # largest box length allowed
+amr.max_box_size = 256         # largest box length allowed
+
+amr.tag_on_grad_velocity = 0
+amr.tag_on_laplacian_velocity = 1
+amr.lap_vel_tagging_val = 1
+amr.tag_on_strain_rate_invariant = 0
+amr.strain_rate_invariant_tagging_val = 1
+
+amr.tag_on_damage = 1
+amr.damage_tagging_val = 0.1
+
+amr.velocity_solver_tolerance = 1.0e-10
+
+###### SOLVER PARAMETERS ######
+#velocity solve type -- 0 = Picard, 1 = JFNK
+amr.velocity_solver_type = 1
+
+picardSolver.num_smooth = 8
+#picardSolver.linearSolver = multigrid
+picardSolver.linearSolver = BiCGStab
+
+JFNKSolver.vtopSafety = 0.9
+JFNKSolver.minPicardIterations = 2
+JFNKSolver.switchRate = 5.0
+JFNKSolver.numMGSmooth = 8
+#JFNKSolver.maxIter = 100
+JFNKSolver.maxIter = 20
+
+JFNKSolver.absTol = 1.0e-5
+JFNKSolver.relTol = 1.0e-10
+#JFNKSolver.BiCGStabRelTol = 4.0e-3
+JFNKSolver.BiCGStabRelTol = 1.0e-5
+JFNKSolver.maxBiCGStabIter = 10
+JFNKSolver.maxBiCGStabIter = 40
+JFNKSolver.normType = 0
+JFNKSolver.verbosity = 5
+JFNKSolver.vtopRelaxMinIter = 4
+JFNKSolver.vtopRelaxTol = 0
+JFNKSolver.numMGIter = 1
+JFNKSolver.h = 0.025
+JFNKSolver.hAdaptive = true 
+JFNKSolver.mgProlongType = 1
+
+# 0 = relax, 1 = BiCGStab, 2 = GMRES, 3 = MultiGrid, 4 = PETSc
+JFNKSolver.solverType = 0
+JFNKSolver.maxBiCGStabIter = 50
+JFNKSolver.MGtol = 1.0e-5
+JFNKSolver.RelaxTol = 1.0e-5
+JFNKSolver.maxRelaxIter = 50
+JFNKSolver.vtopRelaxTol = 0
+#JFNKSolver.eliminateFastIce = true
+#JFNKSolver.eliminateFastIceSpeed = 8.0e+4
